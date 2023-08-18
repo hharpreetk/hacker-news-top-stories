@@ -49,8 +49,10 @@ for submission_dict in submission_dicts:
   titles. append(submission_dict['title'])
   links.append(submission_dict['url'])
   comments.append(submission_dict['comments'])
-  # %%
+
 # Vizualize top stories
-fig = px.bar(x=authors, y=comments)
+title = "Top Stories at Hacker News"
+labels = {'x': 'Authors', 'y': 'Comments'}
+fig = px.bar(x=authors, y=comments, title=title, labels=labels)
 fig.show()
 # %%
