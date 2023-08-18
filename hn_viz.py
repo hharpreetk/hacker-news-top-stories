@@ -51,12 +51,15 @@ for submission_dict in submission_dicts:
     author = submission_dict["author"]
     title = submission_dict["title"]
     url = submission_dict["url"]
-    story_urls.append(f"<a href='{url}'>{title}</a>")
+    # Truncate the title to a certain length
+    max_title_length = 30
+    truncated_title = (title[:max_title_length] + "...") if len(title) > max_title_length else title
+    story_urls.append(f"<a href='{url}'>{truncated_title}</a>")
     scores.append(submission_dict["score"])
     comments = submission_dict["comments"]
     # Build hover texts
-    hover_texts.append(f"<b>Author: {author}</b><br />Comments: {comments}")
-
+    hover_texts.append(f"<b>Author: {author}</b><br /><b>Title: {title}</b><br />Comments: {comments}")
+# %%
 # Vizualize top stories
 title = "Top Stories at Hacker News"
 labels ={'x': 'Story Titles', 'y': 'Scores'}
@@ -64,7 +67,7 @@ fig = px.bar(x=story_urls, y=scores, title=title, labels=labels)
 fig.update_traces(
     marker_color="skyblue",
     hovertemplate=(
-        "<b>Title: %{x}</b><br />" "<b>%{customdata}</b><br />" "<b>Score: %{y}</b>"
+        "<b>%{customdata}</b><br />" "<b>Score: %{y}</b>"
     ),
     customdata=hover_texts,
 )
