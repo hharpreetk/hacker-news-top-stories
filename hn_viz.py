@@ -4,6 +4,7 @@ import json
 
 import plotly.express as px
 from operator import itemgetter
+
 # %%
 # Make an API call, and store the response.
 url = "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -32,27 +33,40 @@ for submission_id in submission_ids:
     submission_dict = {
         "author": response_dict.get("by"),
         "title": response_dict.get("title"),
+        "score": int(response_dict.get("score", 0)),
         "url": response_dict.get("url"),
-        "comments": response_dict.get("descendants")
+        "comments": int(response_dict.get("descendants", 0)),
     }
 
     submission_dicts.append(submission_dict)
 
     # Increment the counter
     num_submissions += 1
-# %%
-submission_dicts = sorted(submission_dicts, key=itemgetter('comments'),reverse=True)
 
-authors, titles, links, comments = [], [], [], []
+# %%
+submission_dicts = sorted(submission_dicts, key=itemgetter("score"), reverse=True)
+
+story_urls, scores, hover_texts = [], [], []
 for submission_dict in submission_dicts:
-  authors.append(submission_dict['author'])
-  titles. append(submission_dict['title'])
-  links.append(submission_dict['url'])
-  comments.append(submission_dict['comments'])
+    author = submission_dict["author"]
+    title = submission_dict["title"]
+    url = submission_dict["url"]
+    story_urls.append(f"<a href='{url}'>{title}</a>")
+    scores.append(submission_dict["score"])
+    comments = submission_dict["comments"]
+    # Build hover texts
+    hover_texts.append(f"<b>Author: {author}</b><br />Comments: {comments}")
 
 # Vizualize top stories
 title = "Top Stories at Hacker News"
-labels = {'x': 'Authors', 'y': 'Comments'}
-fig = px.bar(x=authors, y=comments, title=title, labels=labels)
+labels ={'x': 'Story Titles', 'y': 'Scores'}
+fig = px.bar(x=story_urls, y=scores, title=title, labels=labels)
+fig.update_traces(
+    marker_color="skyblue",
+    hovertemplate=(
+        "<b>Title: %{x}</b><br />" "<b>%{customdata}</b><br />" "<b>Score: %{y}</b>"
+    ),
+    customdata=hover_texts,
+)
+
 fig.show()
-# %%
